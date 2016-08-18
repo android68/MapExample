@@ -1,6 +1,8 @@
 package com.tom.mapexample;
 
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -16,7 +18,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener {
 
     private static final int REQUEST_LOCATION = 100;
     private GoogleMap mMap;
@@ -59,6 +61,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             setupMyLocation();
         }
         Log.d("RQ", "Test2");
+        mMap.setOnMyLocationButtonClickListener(this);
+
+
+
         // Add a marker in Sydney and move the camera
         LatLng taipei101 = new LatLng(25.033684, 121.5628594);
         mMap.addMarker(new MarkerOptions().position(taipei101).title("Marker in Taipei 101"));
@@ -79,5 +85,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void setupMyLocation() {
         //noinspection MissingPermission
         mMap.setMyLocationEnabled(true);
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        LocationManager locationManager =
+                (LocationManager) getSystemService(LOCATION_SERVICE);
+        @SuppressWarnings("MissingPermission")
+        Location loc = locationManager.getLastKnownLocation("gps");
+        if (loc != null){
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(
+                    new LatLng(loc.getLatitude(), loc.getLongitude())
+            ));
+        }
+        return false;
     }
 }
